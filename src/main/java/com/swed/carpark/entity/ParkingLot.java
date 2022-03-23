@@ -12,12 +12,11 @@ import javax.persistence.Id;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-
-public class Car {
+public class ParkingLot {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Integer carId;
-    private Integer weight;
-    private Integer height;
-    private float price;
+    private Integer floor;
+    private Integer weightLimit;
+    private Integer heightLimit;
+    private Float priceMultiplier;
 }

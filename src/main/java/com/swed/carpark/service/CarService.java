@@ -10,8 +10,6 @@ public interface CarService {
 
     List<Car> getCarList();
 
-    Car updateCar(Car car, Integer carId);
-
     void deleteCarById(Integer carId);
 
 }

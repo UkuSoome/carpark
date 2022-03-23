@@ -15,17 +15,12 @@ public class CarServiceImpl implements CarService {
         private CarRepository carRepository;
 
         @Override
-        public Car saveCar(Car department) {
-            return carRepository.save(department);
+        public Car saveCar(Car car) {
+            return carRepository.save(car);
         }
 
         @Override public List<Car> getCarList() {
             return (List<Car>) carRepository.findAll();
-        }
-
-        @Override
-        public Car updateCar(Car car, Integer carId) {
-                return null;
         }
 
         @Override

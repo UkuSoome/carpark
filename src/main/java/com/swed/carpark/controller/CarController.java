@@ -12,24 +12,18 @@ import java.util.List;
 public class CarController {
     @Autowired private CarService carService;
 
-
     @PostMapping("/cars")
     public Car saveCar(@RequestBody Car car) {
         return carService.saveCar(car);
     }
 
     @GetMapping("/cars")
-    public List<Car> fetchDepartmentList() {
+    public List<Car> fetchCarList() {
         return carService.getCarList();
     }
 
-    @PutMapping("/cars/{id}")
-    public Car updateDepartment(@RequestBody Car car, @PathVariable("id") Integer carId) {
-        return carService.updateCar(car, carId);
-    }
-
     @DeleteMapping("/cars/{id}")
-    public String deleteDepartmentById(@PathVariable("id") Integer carId) {
+    public String deleteCarById(@PathVariable("id") Integer carId) {
         carService.deleteCarById(carId);
         return "Deleted Successfully";
     }
