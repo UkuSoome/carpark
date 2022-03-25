@@ -1,10 +1,13 @@
 package com.swed.carpark.repository;
 
 
+import com.swed.carpark.entity.Car;
 import com.swed.carpark.entity.ParkingLot;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ParkingLotRepository extends CrudRepository<ParkingLot, Integer> {
+
+public interface ParkingLotRepository extends CrudRepository<ParkingLot, Integer>, JpaSpecificationExecutor<ParkingLot> {
 }

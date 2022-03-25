@@ -2,21 +2,22 @@ package com.swed.carpark.entity;
 
 import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 
-@Entity
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
+@Entity
+@Table(name ="PARKINGLOT")
 public class ParkingLot {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Integer floor;
-    private Integer weightLimit;
-    private Integer heightLimit;
-    private Float priceMultiplier;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+    @Column(name="weightlim")
+    private Integer weightLim;
+    @Column(name="heightlim")
+    private Integer heightLim;
+    @Column(name="pricemultiplier")
+    private double priceMultiplier;
 }

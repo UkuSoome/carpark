@@ -5,6 +5,7 @@ import com.swed.carpark.service.CarService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -13,8 +14,13 @@ public class CarController {
     @Autowired private CarService carService;
 
     @PostMapping("/cars")
-    public Car saveCar(@RequestBody Car car) {
+    public HashMap<Car, String> saveCar(@RequestBody Car car) {
         return carService.saveCar(car);
+    }
+
+    @GetMapping("/cars2/{weight}")
+    public List<Car> getCarByWeight(@PathVariable("weight") Integer weight) {
+        return carService.getCarByWeight(weight);
     }
 
     @GetMapping("/cars")
