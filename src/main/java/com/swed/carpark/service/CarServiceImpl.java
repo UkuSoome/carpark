@@ -6,6 +6,7 @@ import com.swed.carpark.entity.ParkingLot;
 import com.swed.carpark.entity.ParkingSpace;
 import com.swed.carpark.repository.CarRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -49,7 +50,13 @@ public class CarServiceImpl implements CarService {
         }
 
         @Override
-        public void deleteCarById(Integer carId) {
-            carRepository.deleteById(carId);
+        public String deleteCarById(Integer carId) {
+            try {
+                carRepository.deleteById(carId);
+                return "Car and " + parkingSpaceService.deleteSpaceByCarId(carId);
+            }
+            catch (EmptyResultDataAccessException e) {
+                return "No such car found.";
+            }
         }
 }

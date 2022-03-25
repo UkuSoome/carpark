@@ -15,13 +15,4 @@ public class ParkingLotController {
 
     @PostMapping("/floors")
     public ParkingLot saveFloor(@RequestBody ParkingLot floor) {return parkingLotService.saveFloor(floor) ;}
-
-    @GetMapping("/floors")
-    public List<ParkingLot> fetchParkingFloors() {return parkingLotService.getFloors();}
-
-    @DeleteMapping("/floors/{id}")
-    public String deleteFloorById(@PathVariable("id") Integer floorId) {
-        parkingLotService.deleteFloorById(floorId);
-        return "Floor deleted";
-    }
 }

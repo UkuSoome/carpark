@@ -37,10 +37,4 @@ public class ParkingLotServiceImpl implements ParkingLotService {
             return new ParkingLot();
         }
     }
-
-    @Override
-    public List<ParkingLot> getFloors() {return  (List<ParkingLot>) parkingLotRepository.findAll(); }
-
-    @Override
-    public void deleteFloorById(Integer floorId) { parkingLotRepository.deleteById(floorId); }
 }

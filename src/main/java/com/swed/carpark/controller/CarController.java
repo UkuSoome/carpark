@@ -18,11 +18,6 @@ public class CarController {
         return carService.saveCar(car);
     }
 
-    @GetMapping("/cars2/{weight}")
-    public List<Car> getCarByWeight(@PathVariable("weight") Integer weight) {
-        return carService.getCarByWeight(weight);
-    }
-
     @GetMapping("/cars")
     public List<Car> fetchCarList() {
         return carService.getCarList();
@@ -30,7 +25,6 @@ public class CarController {
 
     @DeleteMapping("/cars/{id}")
     public String deleteCarById(@PathVariable("id") Integer carId) {
-        carService.deleteCarById(carId);
-        return "Deleted Successfully";
+        return carService.deleteCarById(carId);
     }
 }

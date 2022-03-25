@@ -10,5 +10,5 @@ public interface ParkingSpaceService {
 
     List<ParkingSpace> getSpaces();
 
-    void deleteSpaceById(Integer spaceId);
+    String deleteSpaceByCarId(Integer carId);
 }

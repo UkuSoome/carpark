@@ -8,8 +8,4 @@ public interface ParkingLotService {
     ParkingLot saveFloor(ParkingLot parkingLotFloor);
 
     ParkingLot getBestSuitableFloor(Integer weight, Integer height);
-
-    List<ParkingLot> getFloors();
-
-    void deleteFloorById(Integer floorId);
 }
