@@ -18,7 +18,7 @@ public class ParkingSpaceServiceImpl implements ParkingSpaceService {
     private ParkingSpaceRepository parkingSpaceRepository;
 
     @Override
-    public ParkingSpace saveSpace(ParkingSpace parkingSpace) {return parkingSpaceRepository.save(parkingSpace);}
+    public Integer saveSpace(ParkingSpace parkingSpace) {return parkingSpaceRepository.save(parkingSpace).getId();}
 
 
     @Override

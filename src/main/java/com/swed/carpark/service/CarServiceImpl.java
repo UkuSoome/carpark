@@ -16,6 +16,7 @@ import static org.springframework.data.jpa.domain.Specification.where;
 
 @Service
 public class CarServiceImpl implements CarService {
+        private double basePrice = 1.0;
 
         @Autowired
         private CarRepository carRepository;
@@ -32,17 +33,15 @@ public class CarServiceImpl implements CarService {
                 map.put(car, "No suitable parking floor found.");
                 return map;
             }
+            double priceperminute = basePrice + (basePrice * parkingFloor.getPriceMultiplier());
+            car.setPriceperminute(priceperminute);
             Car tempCar = carRepository.save(car);
-            parkingSpaceService.saveSpace(new ParkingSpace(parkingFloor.getId(), tempCar.getId()));
+            Integer spaceId = parkingSpaceService.saveSpace(new ParkingSpace(parkingFloor.getId(), tempCar.getId()));
+            tempCar.setFloorId(parkingFloor.getId());
+            tempCar.setSpaceId(spaceId);
             HashMap<Car, String> map = new HashMap<>();
             map.put(tempCar, "Car parked.");
             return map;
-        }
-
-        @Override
-        public List<Car> getCarByWeight(Integer weight) {
-               return carRepository.findAll(where(
-                      (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("weight"), weight)));
         }
 
         @Override public List<Car> getCarList() {
