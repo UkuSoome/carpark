@@ -11,8 +11,6 @@ public interface CarService {
 
     List<Car> getCarList();
 
-    List<Car> getCarByWeight(Integer weight);
-
     void deleteCarById(Integer carId);
 
 }
