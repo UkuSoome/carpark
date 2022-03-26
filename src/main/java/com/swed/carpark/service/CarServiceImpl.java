@@ -1,6 +1,10 @@
 package com.swed.carpark.service;
 
 
+import com.swed.carpark.constants.DeleteCarResponse;
+import com.swed.carpark.constants.DeleteCarStatus;
+import com.swed.carpark.constants.ParkCarResponse;
+import com.swed.carpark.constants.ParkCarStatus;
 import com.swed.carpark.entity.Car;
 import com.swed.carpark.entity.ParkingLot;
 import com.swed.carpark.entity.ParkingSpace;
@@ -11,15 +15,16 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.UUID;
 
 import static org.springframework.data.jpa.domain.Specification.where;
 
 @Service
 public class CarServiceImpl implements CarService {
         private double basePrice = 1.0;
-
-        @Autowired
+        private double priceperminute;
+    @Autowired
         private CarRepository carRepository;
         @Autowired
         private ParkingLotService parkingLotService;
@@ -27,22 +32,20 @@ public class CarServiceImpl implements CarService {
         private ParkingSpaceService parkingSpaceService;
 
         @Override
-        public HashMap<Car, String> saveCar(Car car) {
+        public ParkCarResponse saveCar(Car car) {
             ParkingLot parkingFloor = parkingLotService.getBestSuitableFloor(car.getWeight(), car.getHeight());
+            UUID uuid = UUID.randomUUID();
             if (parkingFloor.getId() == null) {
-                HashMap<Car, String> map = new HashMap<>();
-                map.put(car, "No suitable parking floor found.");
-                return map;
+                return new ParkCarResponse(uuid, ParkCarStatus.NOSUITABLESPACEFOUND);
             }
-            double priceperminute = basePrice + (basePrice * parkingFloor.getPriceMultiplier());
+            priceperminute = basePrice + (basePrice * parkingFloor.getPriceMultiplier());
             car.setPriceperminute(priceperminute);
-            Car tempCar = carRepository.save(car);
-            Integer spaceId = parkingSpaceService.saveSpace(new ParkingSpace(parkingFloor.getId(), tempCar.getId()));
-            tempCar.setFloorId(parkingFloor.getId());
-            tempCar.setSpaceId(spaceId);
-            HashMap<Car, String> map = new HashMap<>();
-            map.put(tempCar, "Car parked.");
-            return map;
+            car.setUuid(uuid);
+            carRepository.save(car);
+            Integer spaceId = parkingSpaceService.saveSpace(new ParkingSpace(parkingFloor.getId(), car.getUuid()));
+            car.setFloorId(parkingFloor.getId());
+            car.setSpaceId(spaceId);
+            return new ParkCarResponse(uuid, ParkCarStatus.PARKED);
         }
 
         @Override public List<Car> getCarList() {
@@ -50,13 +53,17 @@ public class CarServiceImpl implements CarService {
         }
 
         @Override
-        public String deleteCarById(Integer carId) {
+        public DeleteCarResponse deleteCarById(UUID carId) {
             try {
-                carRepository.deleteById(carId);
-                return "Car and " + parkingSpaceService.deleteSpaceByCarId(carId);
+                Car car = carRepository.findOne(where(
+                        (root, query, criteriaBuilder) ->
+                                criteriaBuilder.equal(root.get("uuid"), carId))).get();
+                carRepository.deleteById(car.getId());
+                parkingSpaceService.deleteSpaceByCarId(carId);
+                return new DeleteCarResponse(carId, DeleteCarStatus.DELETED);
             }
-            catch (EmptyResultDataAccessException e) {
-                return "No such car found.";
+            catch (NoSuchElementException e) {
+                return new DeleteCarResponse(carId, DeleteCarStatus.NOSUCHCARFOUND);
             }
         }
 }

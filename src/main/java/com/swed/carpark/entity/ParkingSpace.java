@@ -4,6 +4,7 @@ package com.swed.carpark.entity;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.UUID;
 
 @Data
 @AllArgsConstructor
@@ -17,9 +18,9 @@ public class ParkingSpace {
     @Column(name="floorid")
     private Integer parkingFloorId;
     @Column(name="carid")
-    private Integer carId;
+    private UUID carId;
 
-    public ParkingSpace(Integer parkingFloorId, Integer carId) {
+    public ParkingSpace(Integer parkingFloorId, UUID carId) {
         this.parkingFloorId = parkingFloorId;
         this.carId = carId;
     }
