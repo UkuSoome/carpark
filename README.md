@@ -16,6 +16,10 @@ cd carpark
 ```
 ./gradlew bootRun or gradlew.bat bootRun
 ```
+4) Run tests
+```
+./gradlew test or gradlew.bat test
+```
 
 
 ### Main endpoints used:
