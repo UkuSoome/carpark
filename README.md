@@ -54,5 +54,5 @@ url = jdbc:h2:mem:carparkdb
 username = sa
 password = Empty
 ```
-2) Tables are created with /src/main/resources/schema-lab.sql file.
-3) Initial parking floors table is inserted with /src/main/resources/data-lab.sql file.
+2) Tables are created by /src/main/resources/schema-lab.sql file.
+3) Initial parking floors table data is created by /src/main/resources/data-lab.sql file.
