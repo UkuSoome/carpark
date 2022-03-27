@@ -49,9 +49,10 @@ curl -X DELETE localhost:8080/cars/{carId}
 Uses embedded H2 database. 
 
 1) Access at localhost:8080/h2console
+```
 url = jdbc:h2:mem:carparkdb
 username = sa
 password = Empty
-
+```
 2) Tables are created with /src/main/resources/schema-lab.sql file.
 3) Initial parking floors table is inserted with /src/main/resources/data-lab.sql file.
