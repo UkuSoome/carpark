@@ -8,6 +8,6 @@ import java.util.UUID;
 @Data
 @AllArgsConstructor
 public class DeleteCarResponse {
-    private UUID uuid;
+    private UUID carId;
     private DeleteCarStatus status;
 }
