@@ -1,6 +1,7 @@
 package com.swed.carpark.service;
 
 import com.swed.carpark.constants.DeleteCarResponse;
+import com.swed.carpark.constants.FindCarResponse;
 import com.swed.carpark.constants.ParkCarResponse;
 import com.swed.carpark.entity.Car;
 import java.util.List;
@@ -13,4 +14,6 @@ public interface CarService {
     List<Car> getCarList();
 
     DeleteCarResponse deleteCarById(UUID carId);
+
+    FindCarResponse findCarByUUID(UUID carId);
 }

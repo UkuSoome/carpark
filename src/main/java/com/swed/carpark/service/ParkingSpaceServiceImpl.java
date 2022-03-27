@@ -25,10 +25,28 @@ public class ParkingSpaceServiceImpl implements ParkingSpaceService {
     public List<ParkingSpace> getSpaces() {return  (List<ParkingSpace>) parkingSpaceRepository.findAll(); }
 
     @Override
-    public void deleteSpaceByCarId(UUID carId) throws NoSuchElementException {
-        ParkingSpace parkingSpace = parkingSpaceRepository.findOne(where(
-                (root, query, criteriaBuilder) ->
-                        criteriaBuilder.equal(root.get("carId"), carId))).get();
-        parkingSpaceRepository.deleteById(parkingSpace.getId());
+    public boolean deleteSpaceByCarId(UUID carId) {
+        try {
+            ParkingSpace parkingSpace = parkingSpaceRepository.findOne(where(
+                    (root, query, criteriaBuilder) ->
+                            criteriaBuilder.equal(root.get("carId"), carId))).get();
+            parkingSpaceRepository.deleteById(parkingSpace.getId());
+            return true;
+        }
+        catch (NoSuchElementException e) {
+            return false;
+        }
+    }
+    @Override
+    public ParkingSpace findSpaceByCarId(UUID carId) {
+        try {
+            ParkingSpace parkingSpace = parkingSpaceRepository.findOne(where(
+                    (root, query, criteriaBuilder) ->
+                            criteriaBuilder.equal(root.get("carId"), carId))).get();
+            return parkingSpace;
+        }
+        catch (NoSuchElementException e) {
+            return new ParkingSpace();
+        }
     }
 }

@@ -4,7 +4,8 @@ import com.swed.carpark.service.CarService;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -13,7 +14,10 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import java.util.UUID;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(value = CarController.class)
+
+
+@SpringBootTest
+@AutoConfigureMockMvc
 public class CarControllerTest {
     @Autowired
     MockMvc mockMvc;
@@ -51,7 +55,16 @@ public class CarControllerTest {
         RequestBuilder request = MockMvcRequestBuilders
                 .delete("/cars/" + uuid.toString());
 
-        mockMvc.perform((request)).andExpect(status().isOk());
+        mockMvc.perform(request).andExpect(status().isOk());
+    }
+
+    @Test
+    public void findCarByUUID() throws Exception {
+        UUID uuid = UUID.randomUUID();
+        RequestBuilder request = MockMvcRequestBuilders
+                .get("/cars/" + uuid.toString());
+
+        mockMvc.perform(request).andExpect(status().isOk());
     }
 }
 

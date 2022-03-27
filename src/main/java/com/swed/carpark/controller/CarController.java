@@ -1,6 +1,7 @@
 package com.swed.carpark.controller;
 
 import com.swed.carpark.constants.DeleteCarResponse;
+import com.swed.carpark.constants.FindCarResponse;
 import com.swed.carpark.constants.ParkCarResponse;
 import com.swed.carpark.constants.ParkCarStatus;
 import com.swed.carpark.entity.Car;
@@ -30,4 +31,7 @@ public class CarController {
     public DeleteCarResponse deleteCarById(@PathVariable("id") UUID carId) {
         return carService.deleteCarById(carId);
     }
+
+    @GetMapping("/cars/{id}")
+    public FindCarResponse findCarByUUID(@PathVariable("id") UUID carId) { return carService.findCarByUUID(carId);}
 }

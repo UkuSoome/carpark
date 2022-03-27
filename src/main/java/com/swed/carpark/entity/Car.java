@@ -19,8 +19,4 @@ public class Car {
     private Integer weight;
     private Integer height;
     private double priceperminute;
-    @Transient
-    private Integer floorId;
-    @Transient
-    private Integer spaceId;
 }

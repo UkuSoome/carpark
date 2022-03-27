@@ -6,10 +6,7 @@ import com.swed.carpark.repository.ParkingLotRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 import static org.springframework.data.jpa.domain.Specification.where;
 
@@ -36,5 +33,9 @@ public class ParkingLotServiceImpl implements ParkingLotService {
         catch (NoSuchElementException e) {
             return new ParkingLot();
         }
+    }
+    @Override
+    public Optional<ParkingLot> findFloorById(Integer id) {
+        return parkingLotRepository.findById(id);
     }
 }

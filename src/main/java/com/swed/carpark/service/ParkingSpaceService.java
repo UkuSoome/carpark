@@ -12,5 +12,7 @@ public interface ParkingSpaceService {
 
     List<ParkingSpace> getSpaces();
 
-    void deleteSpaceByCarId(UUID carId);
+    boolean deleteSpaceByCarId(UUID carId);
+
+    ParkingSpace findSpaceByCarId(UUID carId);
 }
