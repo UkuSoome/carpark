@@ -31,19 +31,19 @@ cd carpark
   "height": 50
 }
 ```
-2) Saves a new car
+and aves a new car
 ```
 curl -X POST -H 'Content-Type: application/json' -d @data.json localhost:8080/cars
 ```
-3) Gets a list of all cars.
+2) Gets a list of all cars.
 ```
 curl localhost:8080/cars
 ```
-4) Gets details about a specific car
+3) Gets details about a specific car
 ```
 curl localhost:8080/cars/{carId}
 ```
-5) Delete a car
+4) Delete a car
 ```
 curl -X DELETE localhost:8080/cars/{carId}
 ```
