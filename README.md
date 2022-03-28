@@ -31,7 +31,7 @@ cd carpark
   "height": 50
 }
 ```
-and aves a new car
+and save a new car
 ```
 curl -X POST -H 'Content-Type: application/json' -d @data.json localhost:8080/cars
 ```
