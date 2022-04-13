@@ -2,34 +2,37 @@ package com.swed.carpark.service;
 
 
 import com.swed.carpark.constants.*;
+import com.swed.carpark.dto.CarDto;
 import com.swed.carpark.entity.Car;
 import com.swed.carpark.entity.ParkingLot;
 import com.swed.carpark.entity.ParkingSpace;
 import com.swed.carpark.repository.CarRepository;
+import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.springframework.data.jpa.domain.Specification.where;
 
 @Service
+@RequiredArgsConstructor
 public class CarServiceImpl implements CarService {
     private BigDecimal basePrice = new BigDecimal("1.0");
     private BigDecimal priceperminute;
 
 
-    @Autowired
-    private CarRepository carRepository;
-    @Autowired
-    private ParkingLotService parkingLotService;
-    @Autowired
-    private ParkingSpaceService parkingSpaceService;
+    private final CarRepository carRepository;
+    private final ParkingLotService parkingLotService;
+    private final ParkingSpaceService parkingSpaceService;
+    private final ModelMapper modelMapper;
 
     @Override
-    public ParkCarResponse saveCar(Car car) {
+    public ParkCarResponse saveCar(CarDto carDto) {
+        Car car = modelMapper.map(carDto, Car.class);
         ParkingLot parkingFloor = parkingLotService.getBestSuitableFloor(car.getWeight(), car.getHeight());
         UUID uuid = UUID.randomUUID();
         if (parkingFloor.getId() == null) {
@@ -43,8 +46,11 @@ public class CarServiceImpl implements CarService {
         return new ParkCarResponse(uuid, ParkCarStatus.PARKED);
     }
 
-    @Override public List<Car> getCarList() {
-        return (List<Car>) carRepository.findAll();
+    @Override public List<FindCarResponse> getCarList() {
+        List<Car> cars = (List<Car>) carRepository.findAll();
+        return cars.stream()
+                .map(car -> carToResponse(car, FindCarStatus.CARFOUND))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -68,12 +74,16 @@ public class CarServiceImpl implements CarService {
             Car car = carRepository.findOne(where(
                     (root, query, criteriaBuilder) ->
                             criteriaBuilder.equal(root.get("uuid"), carId))).get();
-            ParkingSpace parkingSpace = parkingSpaceService.findSpaceByCarId(carId);
-            Optional<ParkingLot> parkingFloor = parkingLotService.findFloorById(parkingSpace.getParkingFloorId());
-            return new FindCarResponse(FindCarStatus.CARFOUND, car.getUuid(), parkingFloor.get().getId(), parkingSpace.getId(), car.getPriceperminute());
+            return carToResponse(car, FindCarStatus.CARFOUND);
         }
         catch (NoSuchElementException e) {
             return new FindCarResponse(FindCarStatus.CARNOTFOUND, carId, null, null, null);
         }
+    }
+
+    private FindCarResponse carToResponse(Car car, FindCarStatus carStatus) {
+        ParkingSpace parkingSpace = parkingSpaceService.findSpaceByCarId(car.getUuid());
+        Optional<ParkingLot> parkingFloor = parkingLotService.findFloorById(parkingSpace.getParkingFloorId());
+        return new FindCarResponse(carStatus, car.getUuid(), parkingFloor.get().getId(), parkingSpace.getId(), car.getPriceperminute());
     }
 }

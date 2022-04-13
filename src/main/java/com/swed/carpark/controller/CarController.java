@@ -3,9 +3,10 @@ package com.swed.carpark.controller;
 import com.swed.carpark.constants.DeleteCarResponse;
 import com.swed.carpark.constants.FindCarResponse;
 import com.swed.carpark.constants.ParkCarResponse;
-import com.swed.carpark.constants.ParkCarStatus;
+import com.swed.carpark.dto.CarDto;
 import com.swed.carpark.entity.Car;
 import com.swed.carpark.service.CarService;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,13 +18,15 @@ import java.util.UUID;
 public class CarController {
     @Autowired private CarService carService;
 
+
+
     @PostMapping("/cars")
-    public ParkCarResponse saveCar(@RequestBody Car car) {
-        return carService.saveCar(car);
+    public ParkCarResponse saveCar(@RequestBody CarDto carDto) {
+        return carService.saveCar(carDto);
     }
 
     @GetMapping("/cars")
-    public List<Car> fetchCarList() {
+    public List<FindCarResponse> fetchCarList() {
         return carService.getCarList();
     }
 
