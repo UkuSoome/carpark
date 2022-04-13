@@ -33,19 +33,19 @@ cd carpark
 ```
 and save a new car
 ```
-curl -X POST -H 'Content-Type: application/json' -d @data.json localhost:8080/cars
+curl -X POST -H 'Content-Type: application/json' -d @data.json localhost:8080/cars/save
 ```
 2) Gets a list of all cars.
 ```
-curl localhost:8080/cars
+curl localhost:8080/cars/findall
 ```
 3) Gets details about a specific car
 ```
-curl localhost:8080/cars/{carId}
+curl localhost:8080/cars/find/{carId}
 ```
 4) Delete a car
 ```
-curl -X DELETE localhost:8080/cars/{carId}
+curl -X DELETE localhost:8080/cars/delete/{carId}
 ```
 
 ### Database:

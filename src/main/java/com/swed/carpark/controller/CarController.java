@@ -15,26 +15,26 @@ import java.util.UUID;
 
 
 @RestController
+@RequestMapping("/cars")
 public class CarController {
     @Autowired private CarService carService;
 
 
-
-    @PostMapping("/cars")
+    @PostMapping("/save")
     public ParkCarResponse saveCar(@RequestBody CarDto carDto) {
         return carService.saveCar(carDto);
     }
 
-    @GetMapping("/cars")
+    @GetMapping("/findall")
     public List<FindCarResponse> fetchCarList() {
         return carService.getCarList();
     }
 
-    @DeleteMapping("/cars/{id}")
+    @DeleteMapping("/delete/{id}")
     public DeleteCarResponse deleteCarById(@PathVariable("id") UUID carId) {
         return carService.deleteCarById(carId);
     }
 
-    @GetMapping("/cars/{id}")
+    @GetMapping("/find/{id}")
     public FindCarResponse findCarByUUID(@PathVariable("id") UUID carId) { return carService.findCarByUUID(carId);}
 }
