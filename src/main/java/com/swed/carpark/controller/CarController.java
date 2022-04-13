@@ -4,10 +4,8 @@ import com.swed.carpark.constants.DeleteCarResponse;
 import com.swed.carpark.constants.FindCarResponse;
 import com.swed.carpark.constants.ParkCarResponse;
 import com.swed.carpark.dto.CarDto;
-import com.swed.carpark.entity.Car;
 import com.swed.carpark.service.CarService;
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,9 +14,9 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/cars")
+@RequiredArgsConstructor
 public class CarController {
-    @Autowired private CarService carService;
-
+    private final CarService carService;
 
     @PostMapping("/save")
     public ParkCarResponse saveCar(@RequestBody CarDto carDto) {

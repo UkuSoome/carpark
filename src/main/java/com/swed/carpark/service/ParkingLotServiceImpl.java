@@ -3,7 +3,7 @@ package com.swed.carpark.service;
 
 import com.swed.carpark.entity.ParkingLot;
 import com.swed.carpark.repository.ParkingLotRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -12,10 +12,9 @@ import static org.springframework.data.jpa.domain.Specification.where;
 
 
 @Service
-
+@RequiredArgsConstructor
 public class ParkingLotServiceImpl implements ParkingLotService {
-    @Autowired
-    private ParkingLotRepository parkingLotRepository;
+    private final ParkingLotRepository parkingLotRepository;
 
     @Override
     public ParkingLot saveFloor(ParkingLot parkingLotFloor) { return parkingLotRepository.save(parkingLotFloor); }
@@ -31,7 +30,7 @@ public class ParkingLotServiceImpl implements ParkingLotService {
             return floors.stream().min(Comparator.comparing(ParkingLot::getPriceMultiplier)).get();
         }
         catch (NoSuchElementException e) {
-            return new ParkingLot();
+            return null;
         }
     }
     @Override

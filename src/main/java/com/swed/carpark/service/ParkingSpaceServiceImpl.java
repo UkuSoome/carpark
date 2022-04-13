@@ -2,7 +2,7 @@ package com.swed.carpark.service;
 
 import com.swed.carpark.entity.ParkingSpace;
 import com.swed.carpark.repository.ParkingSpaceRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,10 +12,10 @@ import java.util.UUID;
 import static org.springframework.data.jpa.domain.Specification.where;
 
 @Service
+@RequiredArgsConstructor
 public class ParkingSpaceServiceImpl implements ParkingSpaceService {
 
-    @Autowired
-    private ParkingSpaceRepository parkingSpaceRepository;
+    private final ParkingSpaceRepository parkingSpaceRepository;
 
     @Override
     public Integer saveSpace(ParkingSpace parkingSpace) {return parkingSpaceRepository.save(parkingSpace).getId();}

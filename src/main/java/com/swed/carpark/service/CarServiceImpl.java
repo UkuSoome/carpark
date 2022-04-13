@@ -32,12 +32,12 @@ public class CarServiceImpl implements CarService {
 
     @Override
     public ParkCarResponse saveCar(CarDto carDto) {
-        Car car = modelMapper.map(carDto, Car.class);
-        ParkingLot parkingFloor = parkingLotService.getBestSuitableFloor(car.getWeight(), car.getHeight());
-        UUID uuid = UUID.randomUUID();
-        if (parkingFloor.getId() == null) {
-            return new ParkCarResponse(uuid, ParkCarStatus.NOSUITABLESPACEFOUND);
+        ParkingLot parkingFloor = parkingLotService.getBestSuitableFloor(carDto.getWeight(), carDto.getHeight());
+        if (parkingFloor == null) {
+            return new ParkCarResponse(null, ParkCarStatus.NOSUITABLESPACEFOUND);
         }
+        Car car = modelMapper.map(carDto, Car.class);
+        UUID uuid = UUID.randomUUID();
         priceperminute = basePrice.add(basePrice.multiply(parkingFloor.getPriceMultiplier()));
         car.setPriceperminute(priceperminute);
         car.setUuid(uuid);
