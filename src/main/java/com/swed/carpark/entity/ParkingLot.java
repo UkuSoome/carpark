@@ -3,6 +3,7 @@ package com.swed.carpark.entity;
 import lombok.*;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 
 
 @Data
@@ -19,5 +20,5 @@ public class ParkingLot {
     @Column(name="heightlim")
     private Integer heightLim;
     @Column(name="pricemultiplier")
-    private double priceMultiplier;
+    private BigDecimal priceMultiplier;
 }

@@ -3,6 +3,7 @@ package com.swed.carpark.entity;
 import lombok.*;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.UUID;
 
 
@@ -18,5 +19,5 @@ public class Car {
     private UUID uuid;
     private Integer weight;
     private Integer height;
-    private double priceperminute;
+    private BigDecimal priceperminute;
 }

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 
 @SpringBootTest
@@ -16,7 +17,7 @@ public class parkingLotServiceTest {
 
     @Test
     public void saveFloor() {
-        ParkingLot testFloor = new ParkingLot(1, 1000, 500, 0.5);
+        ParkingLot testFloor = new ParkingLot(1, 1000, 500, new BigDecimal(0.5));
         ParkingLot floor = parkingLotService.saveFloor(testFloor);
         assert(floor.getId()==1);
     }

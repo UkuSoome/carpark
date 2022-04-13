@@ -3,6 +3,7 @@ package com.swed.carpark.constants;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Data
@@ -12,5 +13,5 @@ public class FindCarResponse {
     private UUID carid;
     private Integer floorId;
     private Integer spaceId;
-    private double pricePerMinute;
+    private BigDecimal pricePerMinute;
 }

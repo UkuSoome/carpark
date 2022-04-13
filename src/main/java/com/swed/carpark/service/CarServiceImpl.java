@@ -10,14 +10,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 import static org.springframework.data.jpa.domain.Specification.where;
 
 @Service
 public class CarServiceImpl implements CarService {
-    private double basePrice = 1.0;
-    private double priceperminute;
+    private BigDecimal basePrice = new BigDecimal("1.0");
+    private BigDecimal priceperminute;
+
+
     @Autowired
     private CarRepository carRepository;
     @Autowired
@@ -32,7 +35,7 @@ public class CarServiceImpl implements CarService {
         if (parkingFloor.getId() == null) {
             return new ParkCarResponse(uuid, ParkCarStatus.NOSUITABLESPACEFOUND);
         }
-        priceperminute = basePrice + (basePrice * parkingFloor.getPriceMultiplier());
+        priceperminute = basePrice.add(basePrice.multiply(parkingFloor.getPriceMultiplier()));
         car.setPriceperminute(priceperminute);
         car.setUuid(uuid);
         carRepository.save(car);
@@ -70,7 +73,7 @@ public class CarServiceImpl implements CarService {
             return new FindCarResponse(FindCarStatus.CARFOUND, car.getUuid(), parkingFloor.get().getId(), parkingSpace.getId(), car.getPriceperminute());
         }
         catch (NoSuchElementException e) {
-            return new FindCarResponse(FindCarStatus.CARNOTFOUND, carId, null, null, 0.0);
+            return new FindCarResponse(FindCarStatus.CARNOTFOUND, carId, null, null, null);
         }
     }
 }
