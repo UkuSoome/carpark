@@ -2,8 +2,11 @@ package com.swed.carpark.controller;
 
 import com.swed.carpark.constants.*;
 import com.swed.carpark.dto.CarDto;
+import com.swed.carpark.exception.UuidNotFoundException;
 import com.swed.carpark.service.CarService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
@@ -34,11 +37,12 @@ public class CarController {
     }
 
     @DeleteMapping("/delete/{id}")
-    public DeleteCarResponse deleteCarById(@PathVariable("id") String carId) {
+    public ResponseEntity<?> deleteCarById(@PathVariable("id") String carId) {
         if (!UUID_REGEX_PATTERN.matcher(carId).matches()) {
-            return new DeleteCarResponse(DeleteCarStatus.INVALIDUUID, null);
+            throw new UuidNotFoundException("Invalid UUID format.");
         }
-        return carService.deleteCarById(UUID.fromString(carId));
+        DeleteCarResponse response = carService.deleteCarById(UUID.fromString(carId));
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping("/find/{id}")

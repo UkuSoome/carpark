@@ -10,6 +10,7 @@ import com.swed.carpark.repository.CarRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -57,31 +58,28 @@ public class CarServiceImpl implements CarService {
     }
 
     @Override
+    @Transactional
     public DeleteCarResponse deleteCarById(UUID carId) {
-        try {
-            Car car = carRepository.findOne(where(
-                    (root, query, criteriaBuilder) ->
-                            criteriaBuilder.equal(root.get("uuid"), carId.toString()))).get();
-            carRepository.deleteById(car.getId());
-            parkingSpaceService.deleteSpaceByCarId(carId);
-            return new DeleteCarResponse(DeleteCarStatus.DELETED, carId);
-        }
-        catch (NoSuchElementException e) {
+        Car car = findCar(carId);
+        if (car == null) {
             return new DeleteCarResponse(DeleteCarStatus.NOSUCHCARFOUND, carId);
         }
+        carRepository.deleteById(car.getId());
+        try {
+            parkingSpaceService.deleteSpaceByCarId(carId);
+        } catch (NoSuchElementException e) {
+            throw new RuntimeException("something went wrong");
+        }
+        return new DeleteCarResponse(DeleteCarStatus.DELETED, carId);
     }
 
     @Override
     public FindCarResponse findCarByUUID(UUID carId) {
-        try {
-            Car car = carRepository.findOne(where(
-                    (root, query, criteriaBuilder) ->
-                            criteriaBuilder.equal(root.get("uuid"), carId.toString()))).get();
-            return carToResponse(car);
-        }
-        catch (NoSuchElementException e) {
+        Car car = findCar(carId);
+        if (car == null) {
             return new FindCarResponse(FindCarStatus.CARNOTFOUND, carId, null, null, null);
         }
+        return carToResponse(car);
     }
 
     private FindCarResponse carToResponse(Car car) {
@@ -97,5 +95,14 @@ public class CarServiceImpl implements CarService {
             }
         }
         return null;
+    }
+
+    private Car findCar(UUID carId) {
+        try {
+            Car car = carRepository.findOne(where(
+                    (root, query, criteriaBuilder) ->
+                            criteriaBuilder.equal(root.get("uuid"), carId.toString()))).get();
+            return car;
+        } catch (NoSuchElementException e){ return null;}
     }
 }
