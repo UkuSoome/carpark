@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.springframework.data.jpa.domain.Specification.where;
@@ -18,7 +19,7 @@ public class ParkingSpaceServiceImpl implements ParkingSpaceService {
     private final ParkingSpaceRepository parkingSpaceRepository;
 
     @Override
-    public Integer saveSpace(ParkingSpace parkingSpace) {return parkingSpaceRepository.save(parkingSpace).getId();}
+    public Integer saveSpace(ParkingSpace parkingSpace) {return parkingSpaceRepository.save(parkingSpace).getSpaceId();}
 
 
     @Override
@@ -30,7 +31,7 @@ public class ParkingSpaceServiceImpl implements ParkingSpaceService {
             ParkingSpace parkingSpace = parkingSpaceRepository.findOne(where(
                     (root, query, criteriaBuilder) ->
                             criteriaBuilder.equal(root.get("carId"), carId))).get();
-            parkingSpaceRepository.deleteById(parkingSpace.getId());
+            parkingSpaceRepository.delete(parkingSpace);
             return true;
         }
         catch (NoSuchElementException e) {
@@ -48,5 +49,23 @@ public class ParkingSpaceServiceImpl implements ParkingSpaceService {
         catch (NoSuchElementException e) {
             return new ParkingSpace();
         }
+    }
+
+    @Override
+    public List<ParkingSpace> findSpacesByFloorId(Integer floorId) {
+        List<ParkingSpace> parkingSpaces = parkingSpaceRepository.findAll(where(
+                (root, query, criteriaBuilder) ->
+                        criteriaBuilder.equal(root.get("floorId"), floorId)));
+        return parkingSpaces;
+    }
+
+    @Override
+    public ParkingSpace findSpaceBySpaceId(Integer spaceId, Integer floorId) {
+        Optional<ParkingSpace> space = parkingSpaceRepository.findOne(where(
+                (root, query, criteriaBuilder) ->
+                        criteriaBuilder.and(
+                        criteriaBuilder.equal(root.get("spaceId"), spaceId), criteriaBuilder.equal(root.get("floorId"), floorId)
+                        )));
+        return space.orElse(null);
     }
 }

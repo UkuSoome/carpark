@@ -4,6 +4,7 @@ package com.swed.carpark.entity;
 import lombok.*;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.UUID;
 
 @Data
@@ -11,17 +12,15 @@ import java.util.UUID;
 @NoArgsConstructor
 @Entity
 @Table(name = "PARKINGSPACES")
-public class ParkingSpace {
+@IdClass(ParkingSpaceKey.class)
+public class ParkingSpace implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    @Column(name="spaceid")
+    private Integer spaceId;
+    @Id
     @Column(name="floorid")
-    private Integer parkingFloorId;
+    private Integer floorId;
     @Column(name="carid")
     private UUID carId;
 
-    public ParkingSpace(Integer parkingFloorId, UUID carId) {
-        this.parkingFloorId = parkingFloorId;
-        this.carId = carId;
-    }
 }

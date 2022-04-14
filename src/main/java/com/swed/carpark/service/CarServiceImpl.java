@@ -9,7 +9,6 @@ import com.swed.carpark.entity.ParkingSpace;
 import com.swed.carpark.repository.CarRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -32,17 +31,21 @@ public class CarServiceImpl implements CarService {
 
     @Override
     public ParkCarResponse saveCar(CarDto carDto) {
-        ParkingLot parkingFloor = parkingLotService.getBestSuitableFloor(carDto.getWeight(), carDto.getHeight());
-        if (parkingFloor == null) {
+        ParkingLot floor = parkingLotService.getBestSuitableFloor(carDto.getWeight(), carDto.getHeight());
+        if (floor == null) {
             return new ParkCarResponse(ParkCarStatus.NOSUITABLESPACEFOUND, null);
         }
         Car car = modelMapper.map(carDto, Car.class);
         UUID uuid = UUID.randomUUID();
-        priceperminute = basePrice.add(basePrice.multiply(parkingFloor.getPriceMultiplier()));
+        priceperminute = basePrice.add(basePrice.multiply(floor.getPriceMultiplier()));
         car.setPriceperminute(priceperminute);
         car.setUuid(uuid);
         carRepository.save(car);
-        parkingSpaceService.saveSpace(new ParkingSpace(parkingFloor.getId(), car.getUuid()));
+        Integer spaceId = findFirstEmptySpace(floor.getNumberOfSpaces(), floor.getId()); //there probably is some better method to do this, but i decided to save time.
+        if (spaceId == null) {
+            spaceId = 1;
+        }
+        parkingSpaceService.saveSpace(new ParkingSpace(spaceId,floor.getId(), car.getUuid()));
         return new ParkCarResponse(ParkCarStatus.PARKED, uuid);
     }
 
@@ -83,7 +86,16 @@ public class CarServiceImpl implements CarService {
 
     private FindCarResponse carToResponse(Car car, FindCarStatus carStatus) {
         ParkingSpace parkingSpace = parkingSpaceService.findSpaceByCarId(car.getUuid());
-        Optional<ParkingLot> parkingFloor = parkingLotService.findFloorById(parkingSpace.getParkingFloorId());
-        return new FindCarResponse(carStatus, car.getUuid(), parkingFloor.get().getId(), parkingSpace.getId(), car.getPriceperminute());
+        Optional<ParkingLot> parkingFloor = parkingLotService.findFloorById(parkingSpace.getFloorId());
+        return new FindCarResponse(carStatus, car.getUuid(), parkingFloor.get().getId(), parkingSpace.getSpaceId(), car.getPriceperminute());
+    }
+
+    private Integer findFirstEmptySpace(Integer numberOfSpaces, Integer floorId) {
+        for (int i = 1; i <= numberOfSpaces; i++) {
+            if (parkingSpaceService.findSpaceBySpaceId(i,floorId) == null) {
+                return i;
+            }
+        }
+        return null;
     }
 }

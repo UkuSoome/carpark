@@ -1,7 +1,7 @@
 package com.swed.carpark.service;
 
 
-import com.swed.carpark.constants.DeleteCarResponse;
+import com.swed.carpark.entity.ParkingLot;
 import com.swed.carpark.entity.ParkingSpace;
 import java.util.List;
 import java.util.UUID;
@@ -15,4 +15,8 @@ public interface ParkingSpaceService {
     boolean deleteSpaceByCarId(UUID carId);
 
     ParkingSpace findSpaceByCarId(UUID carId);
+
+    List<ParkingSpace> findSpacesByFloorId(Integer floorId);
+
+    ParkingSpace findSpaceBySpaceId(Integer spaceId, Integer floorId);
 }

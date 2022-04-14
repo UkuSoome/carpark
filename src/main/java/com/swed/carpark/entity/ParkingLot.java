@@ -21,4 +21,6 @@ public class ParkingLot {
     private Integer heightLim;
     @Column(name="pricemultiplier")
     private BigDecimal priceMultiplier;
+    @Column(name="numberofspaces")
+    private Integer numberOfSpaces;
 }

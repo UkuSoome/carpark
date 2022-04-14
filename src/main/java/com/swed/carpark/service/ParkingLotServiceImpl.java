@@ -15,7 +15,7 @@ import static org.springframework.data.jpa.domain.Specification.where;
 @RequiredArgsConstructor
 public class ParkingLotServiceImpl implements ParkingLotService {
     private final ParkingLotRepository parkingLotRepository;
-
+    private final ParkingSpaceService parkingSpaceService;
     @Override
     public ParkingLot saveFloor(ParkingLot parkingLotFloor) { return parkingLotRepository.save(parkingLotFloor); }
 
@@ -27,7 +27,10 @@ public class ParkingLotServiceImpl implements ParkingLotService {
                         criteriaBuilder.greaterThanOrEqualTo(root.get("heightLim"), height)
         )));
         try {
-            return floors.stream().min(Comparator.comparing(ParkingLot::getPriceMultiplier)).get();
+            return floors
+                    .stream()
+                    .filter(floor -> floor.getNumberOfSpaces() > parkingSpaceService.findSpacesByFloorId(floor.getId()).size())
+                    .min(Comparator.comparing(ParkingLot::getPriceMultiplier)).get();
         }
         catch (NoSuchElementException e) {
             return null;
