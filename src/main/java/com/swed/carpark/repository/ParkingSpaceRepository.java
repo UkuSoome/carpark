@@ -1,7 +1,6 @@
 package com.swed.carpark.repository;
 
 
-import com.swed.carpark.entity.ParkingLot;
 import com.swed.carpark.entity.ParkingSpace;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.repository.CrudRepository;

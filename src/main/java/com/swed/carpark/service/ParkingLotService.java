@@ -3,6 +3,7 @@ package com.swed.carpark.service;
 
 import com.swed.carpark.entity.ParkingLot;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface ParkingLotService {
