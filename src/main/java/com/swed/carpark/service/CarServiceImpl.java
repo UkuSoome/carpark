@@ -34,7 +34,7 @@ public class CarServiceImpl implements CarService {
     public ParkCarResponse saveCar(CarDto carDto) {
         ParkingLot parkingFloor = parkingLotService.getBestSuitableFloor(carDto.getWeight(), carDto.getHeight());
         if (parkingFloor == null) {
-            return new ParkCarResponse(null, ParkCarStatus.NOSUITABLESPACEFOUND);
+            return new ParkCarResponse(ParkCarStatus.NOSUITABLESPACEFOUND, null);
         }
         Car car = modelMapper.map(carDto, Car.class);
         UUID uuid = UUID.randomUUID();
@@ -43,7 +43,7 @@ public class CarServiceImpl implements CarService {
         car.setUuid(uuid);
         carRepository.save(car);
         parkingSpaceService.saveSpace(new ParkingSpace(parkingFloor.getId(), car.getUuid()));
-        return new ParkCarResponse(uuid, ParkCarStatus.PARKED);
+        return new ParkCarResponse(ParkCarStatus.PARKED, uuid);
     }
 
     @Override public List<FindCarResponse> getCarList() {
@@ -61,10 +61,10 @@ public class CarServiceImpl implements CarService {
                             criteriaBuilder.equal(root.get("uuid"), carId))).get();
             carRepository.deleteById(car.getId());
             parkingSpaceService.deleteSpaceByCarId(carId);
-            return new DeleteCarResponse(carId, DeleteCarStatus.DELETED);
+            return new DeleteCarResponse(DeleteCarStatus.DELETED, carId);
         }
         catch (NoSuchElementException e) {
-            return new DeleteCarResponse(carId, DeleteCarStatus.NOSUCHCARFOUND);
+            return new DeleteCarResponse(DeleteCarStatus.NOSUCHCARFOUND, carId);
         }
     }
 

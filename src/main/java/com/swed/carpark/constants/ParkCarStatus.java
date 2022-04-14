@@ -2,5 +2,6 @@ package com.swed.carpark.constants;
 
 public enum ParkCarStatus {
     PARKED,
-    NOSUITABLESPACEFOUND
+    NOSUITABLESPACEFOUND,
+    INVALIDINPUT
 }
