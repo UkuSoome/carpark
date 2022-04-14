@@ -14,7 +14,7 @@ public interface ParkingSpaceService {
 
     boolean deleteSpaceByCarId(UUID carId);
 
-    ParkingSpace findSpaceByCarId(UUID carId);
+    ParkingSpace findSpaceByCarId(String carId);
 
     List<ParkingSpace> findSpacesByFloorId(Integer floorId);
 

@@ -16,7 +16,7 @@ public class Car {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    private UUID uuid;
+    private String uuid;
     private Integer weight;
     private Integer height;
     private BigDecimal priceperminute;

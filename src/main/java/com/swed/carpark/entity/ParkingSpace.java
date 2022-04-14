@@ -21,6 +21,6 @@ public class ParkingSpace implements Serializable {
     @Column(name="floorid")
     private Integer floorId;
     @Column(name="carid")
-    private UUID carId;
+    private String carId;
 
 }

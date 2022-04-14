@@ -39,20 +39,20 @@ public class CarServiceImpl implements CarService {
         UUID uuid = UUID.randomUUID();
         priceperminute = basePrice.add(basePrice.multiply(floor.getPriceMultiplier()));
         car.setPriceperminute(priceperminute);
-        car.setUuid(uuid);
+        car.setUuid(uuid.toString());
         carRepository.save(car);
         Integer spaceId = findFirstEmptySpace(floor.getNumberOfSpaces(), floor.getId()); //there probably is some better method to do this, but i decided to save time.
         if (spaceId == null) {
             spaceId = 1;
         }
-        parkingSpaceService.saveSpace(new ParkingSpace(spaceId,floor.getId(), car.getUuid()));
+        parkingSpaceService.saveSpace(new ParkingSpace(spaceId,floor.getId(), car.getUuid().toString()));
         return new ParkCarResponse(ParkCarStatus.PARKED, uuid);
     }
 
     @Override public List<FindCarResponse> getCarList() {
         List<Car> cars = (List<Car>) carRepository.findAll();
         return cars.stream()
-                .map(car -> carToResponse(car, FindCarStatus.CARFOUND))
+                .map(this::carToResponse)
                 .collect(Collectors.toList());
     }
 
@@ -61,7 +61,7 @@ public class CarServiceImpl implements CarService {
         try {
             Car car = carRepository.findOne(where(
                     (root, query, criteriaBuilder) ->
-                            criteriaBuilder.equal(root.get("uuid"), carId))).get();
+                            criteriaBuilder.equal(root.get("uuid"), carId.toString()))).get();
             carRepository.deleteById(car.getId());
             parkingSpaceService.deleteSpaceByCarId(carId);
             return new DeleteCarResponse(DeleteCarStatus.DELETED, carId);
@@ -76,18 +76,18 @@ public class CarServiceImpl implements CarService {
         try {
             Car car = carRepository.findOne(where(
                     (root, query, criteriaBuilder) ->
-                            criteriaBuilder.equal(root.get("uuid"), carId))).get();
-            return carToResponse(car, FindCarStatus.CARFOUND);
+                            criteriaBuilder.equal(root.get("uuid"), carId.toString()))).get();
+            return carToResponse(car);
         }
         catch (NoSuchElementException e) {
             return new FindCarResponse(FindCarStatus.CARNOTFOUND, carId, null, null, null);
         }
     }
 
-    private FindCarResponse carToResponse(Car car, FindCarStatus carStatus) {
+    private FindCarResponse carToResponse(Car car) {
         ParkingSpace parkingSpace = parkingSpaceService.findSpaceByCarId(car.getUuid());
-        Optional<ParkingLot> parkingFloor = parkingLotService.findFloorById(parkingSpace.getFloorId());
-        return new FindCarResponse(carStatus, car.getUuid(), parkingFloor.get().getId(), parkingSpace.getSpaceId(), car.getPriceperminute());
+        ParkingLot parkingFloor = parkingLotService.findFloorById(parkingSpace.getFloorId());
+        return new FindCarResponse(FindCarStatus.CARFOUND, UUID.fromString(car.getUuid()), parkingFloor.getId(), parkingSpace.getSpaceId(), car.getPriceperminute());
     }
 
     private Integer findFirstEmptySpace(Integer numberOfSpaces, Integer floorId) {

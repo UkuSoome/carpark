@@ -30,7 +30,7 @@ public class ParkingSpaceServiceImpl implements ParkingSpaceService {
         try {
             ParkingSpace parkingSpace = parkingSpaceRepository.findOne(where(
                     (root, query, criteriaBuilder) ->
-                            criteriaBuilder.equal(root.get("carId"), carId))).get();
+                            criteriaBuilder.equal(root.get("carId"), carId.toString()))).get();
             parkingSpaceRepository.delete(parkingSpace);
             return true;
         }
@@ -39,7 +39,7 @@ public class ParkingSpaceServiceImpl implements ParkingSpaceService {
         }
     }
     @Override
-    public ParkingSpace findSpaceByCarId(UUID carId) {
+    public ParkingSpace findSpaceByCarId(String carId) {
         try {
             ParkingSpace parkingSpace = parkingSpaceRepository.findOne(where(
                     (root, query, criteriaBuilder) ->

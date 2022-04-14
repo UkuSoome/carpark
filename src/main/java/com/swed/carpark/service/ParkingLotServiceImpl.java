@@ -37,7 +37,7 @@ public class ParkingLotServiceImpl implements ParkingLotService {
         }
     }
     @Override
-    public Optional<ParkingLot> findFloorById(Integer id) {
-        return parkingLotRepository.findById(id);
+    public ParkingLot findFloorById(Integer id) {
+        return parkingLotRepository.findById(id).orElse(null);
     }
 }
