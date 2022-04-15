@@ -12,7 +12,7 @@ public interface ParkingSpaceService {
 
     List<ParkingSpace> getSpaces();
 
-    boolean deleteSpaceByCarId(UUID carId);
+    void deleteSpaceByCarId(UUID carId);
 
     ParkingSpace findSpaceByCarId(String carId);
 

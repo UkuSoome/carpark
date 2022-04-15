@@ -6,6 +6,7 @@ import com.swed.carpark.dto.CarDto;
 import com.swed.carpark.entity.Car;
 import com.swed.carpark.entity.ParkingLot;
 import com.swed.carpark.entity.ParkingSpace;
+import com.swed.carpark.exception.DbException;
 import com.swed.carpark.repository.CarRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -31,22 +32,31 @@ public class CarServiceImpl implements CarService {
     private final ModelMapper modelMapper;
 
     @Override
+    @Transactional
     public ParkCarResponse saveCar(CarDto carDto) {
         ParkingLot floor = parkingLotService.getBestSuitableFloor(carDto.getWeight(), carDto.getHeight());
         if (floor == null) {
-            return new ParkCarResponse(ParkCarStatus.NOSUITABLESPACEFOUND, null);
+            return new ParkCarResponse(ParkCarStatus.NOSUITABLESPACEFOUND, null); // this could also be an http not found error.
         }
         Car car = modelMapper.map(carDto, Car.class);
         UUID uuid = UUID.randomUUID();
         priceperminute = basePrice.add(basePrice.multiply(floor.getPriceMultiplier()));
         car.setPriceperminute(priceperminute);
         car.setUuid(uuid.toString());
-        carRepository.save(car);
-        Integer spaceId = findFirstEmptySpace(floor.getNumberOfSpaces(), floor.getId()); //there probably is some better method to do this, but i decided to save time.
-        if (spaceId == null) {
+        try {
+            carRepository.save(car);
+        } catch(IllegalArgumentException e) {
+            throw new DbException("Something went wrong. Car save failed.");
+        }
+        Integer spaceId = findFirstEmptySpace(floor.getNumberOfSpaces(), floor.getId()); //there probably is some better method to do this,
+        if (spaceId == null) {                                                           //but i decided to save time and do it the easy way.
             spaceId = 1;
         }
-        parkingSpaceService.saveSpace(new ParkingSpace(spaceId,floor.getId(), car.getUuid().toString()));
+        try {
+            parkingSpaceService.saveSpace(new ParkingSpace(spaceId, floor.getId(), car.getUuid()));
+        } catch(IllegalArgumentException e) {
+            throw new DbException("Something went wrong. Parking space save failed.");
+        }
         return new ParkCarResponse(ParkCarStatus.PARKED, uuid);
     }
 
@@ -60,22 +70,26 @@ public class CarServiceImpl implements CarService {
     @Override
     @Transactional
     public DeleteCarResponse deleteCarById(UUID carId) {
-        Car car = findCar(carId);
+        Car car = findEmptyParkingSpot(carId);
         if (car == null) {
-            return new DeleteCarResponse(DeleteCarStatus.NOSUCHCARFOUND, carId);
+            return new DeleteCarResponse(DeleteCarStatus.NOSUCHCARFOUND, carId); // could be http 404 error if needed.
         }
-        carRepository.deleteById(car.getId());
+        try {
+            carRepository.deleteById(car.getId());
+        } catch (IllegalArgumentException e) {
+            throw new DbException("Something went wrong. Car not found."); // should never get here since the above findEmptyParkingSpot fails first.
+        }                                                                  // But just in case some weird situation happens.
         try {
             parkingSpaceService.deleteSpaceByCarId(carId);
         } catch (NoSuchElementException e) {
-            throw new RuntimeException("something went wrong");
+            throw new DbException("Something went wrong. Parking space not found.");
         }
         return new DeleteCarResponse(DeleteCarStatus.DELETED, carId);
     }
 
     @Override
     public FindCarResponse findCarByUUID(UUID carId) {
-        Car car = findCar(carId);
+        Car car = findEmptyParkingSpot(carId);
         if (car == null) {
             return new FindCarResponse(FindCarStatus.CARNOTFOUND, carId, null, null, null);
         }
@@ -97,7 +111,7 @@ public class CarServiceImpl implements CarService {
         return null;
     }
 
-    private Car findCar(UUID carId) {
+    private Car findEmptyParkingSpot(UUID carId) {
         try {
             Car car = carRepository.findOne(where(
                     (root, query, criteriaBuilder) ->

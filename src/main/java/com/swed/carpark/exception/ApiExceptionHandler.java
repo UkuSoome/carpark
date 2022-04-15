@@ -8,8 +8,12 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class ApiExceptionHandler {
 
-    @ExceptionHandler(UuidNotFoundException.class)
-    public ResponseEntity<Object> uuidNotFoundHandler(UuidNotFoundException e) {
+    @ExceptionHandler(UuidException.class)
+    public ResponseEntity<Object> UuidExceptionHandler(UuidException e) {
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+    }
+    @ExceptionHandler(DbException.class)
+    public ResponseEntity<Object> DbExceptionHandler(DbException e) {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
     }
 }

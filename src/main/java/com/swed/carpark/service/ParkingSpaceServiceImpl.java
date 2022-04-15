@@ -19,19 +19,19 @@ public class ParkingSpaceServiceImpl implements ParkingSpaceService {
     private final ParkingSpaceRepository parkingSpaceRepository;
 
     @Override
-    public Integer saveSpace(ParkingSpace parkingSpace) {return parkingSpaceRepository.save(parkingSpace).getSpaceId();}
+    public Integer saveSpace(ParkingSpace parkingSpace) throws IllegalArgumentException
+    {return parkingSpaceRepository.save(parkingSpace).getSpaceId();}
 
 
     @Override
     public List<ParkingSpace> getSpaces() {return  (List<ParkingSpace>) parkingSpaceRepository.findAll(); }
 
     @Override
-    public boolean deleteSpaceByCarId(UUID carId) throws NoSuchElementException {
+    public void deleteSpaceByCarId(UUID carId) throws NoSuchElementException {
         ParkingSpace parkingSpace = parkingSpaceRepository.findOne(where(
                 (root, query, criteriaBuilder) ->
                         criteriaBuilder.equal(root.get("carId"), carId.toString()))).get();
         parkingSpaceRepository.delete(parkingSpace);
-        return true;
     }
     @Override
     public ParkingSpace findSpaceByCarId(String carId) {
