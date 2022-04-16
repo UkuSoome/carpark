@@ -10,7 +10,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class FindCarResponse {
     private FindCarStatus carFound;
-    private UUID carid;
+    private String carid;
     private Integer floorId;
     private Integer spaceId;
     private BigDecimal pricePerMinute;

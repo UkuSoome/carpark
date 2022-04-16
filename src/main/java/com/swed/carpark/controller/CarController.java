@@ -41,7 +41,7 @@ public class CarController {
         if (!UUID_REGEX_PATTERN.matcher(carId).matches()) {
             throw new UuidException("Invalid UUID format.");
         }
-        DeleteCarResponse response = carService.deleteCarById(UUID.fromString(carId));
+        DeleteCarResponse response = carService.deleteCarById(carId);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -50,6 +50,6 @@ public class CarController {
         if (!UUID_REGEX_PATTERN.matcher(carId).matches()) {
             throw new UuidException("Invalid UUID format.");
         }
-        return carService.findCarByUUID(UUID.fromString(carId));
+        return carService.findCarByUUID(carId);
     }
 }

@@ -1,6 +1,7 @@
 package com.swed.carpark.service;
 
 import com.swed.carpark.entity.ParkingSpace;
+import com.swed.carpark.exception.DbException;
 import com.swed.carpark.repository.ParkingSpaceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -8,7 +9,6 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.UUID;
 
 import static org.springframework.data.jpa.domain.Specification.where;
 
@@ -20,18 +20,28 @@ public class ParkingSpaceServiceImpl implements ParkingSpaceService {
 
     @Override
     public Integer saveSpace(ParkingSpace parkingSpace) throws IllegalArgumentException
-    {return parkingSpaceRepository.save(parkingSpace).getSpaceId();}
+    {
+        try {
+            return parkingSpaceRepository.save(parkingSpace).getSpaceId();
+        } catch (IllegalArgumentException e) {
+            throw new DbException("Something went wrong. Parking space save failed.");
+        }
+    }
 
 
     @Override
     public List<ParkingSpace> getSpaces() {return  (List<ParkingSpace>) parkingSpaceRepository.findAll(); }
 
     @Override
-    public void deleteSpaceByCarId(UUID carId) throws NoSuchElementException {
-        ParkingSpace parkingSpace = parkingSpaceRepository.findOne(where(
-                (root, query, criteriaBuilder) ->
-                        criteriaBuilder.equal(root.get("carId"), carId.toString()))).get();
-        parkingSpaceRepository.delete(parkingSpace);
+    public void deleteSpaceByCarId(String carId) {
+        try {
+            ParkingSpace parkingSpace = parkingSpaceRepository.findOne(where(
+                    (root, query, criteriaBuilder) ->
+                            criteriaBuilder.equal(root.get("carId"), carId))).get();
+            parkingSpaceRepository.delete(parkingSpace);
+        } catch (NoSuchElementException e) {
+            throw new DbException("Something went wrong. Parking space not found.");
+        }
     }
     @Override
     public ParkingSpace findSpaceByCarId(String carId) {

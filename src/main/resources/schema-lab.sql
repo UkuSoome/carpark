@@ -1,9 +1,10 @@
 CREATE TABLE IF NOT EXISTS CARS (
     id IDENTITY NOT NULL,
-    uuid varchar(36),
+    carid varchar(36),
     weight INT,
     height INT,
-    priceperminute NUMERIC(4,2)
+    priceperminute NUMERIC(4,2),
+    starttime DATETIME
 );
 
 CREATE TABLE IF NOT EXISTS PARKINGLOT (
@@ -12,6 +13,7 @@ CREATE TABLE IF NOT EXISTS PARKINGLOT (
     heightlim INT,
     pricemultiplier NUMERIC(4,2),
     numberofspaces INT
+
 );
 
 CREATE TABLE IF NOT EXISTS PARKINGSPACES (

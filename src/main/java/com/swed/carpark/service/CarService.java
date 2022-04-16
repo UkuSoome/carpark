@@ -14,7 +14,7 @@ public interface CarService {
 
     List<FindCarResponse> getCarList();
 
-    DeleteCarResponse deleteCarById(UUID carId);
+    DeleteCarResponse deleteCarById(String carId);
 
-    FindCarResponse findCarByUUID(UUID carId);
+    FindCarResponse findCarByUUID(String carId);
 }

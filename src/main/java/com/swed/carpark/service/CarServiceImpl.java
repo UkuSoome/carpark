@@ -14,6 +14,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Period;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -24,7 +28,7 @@ import static org.springframework.data.jpa.domain.Specification.where;
 public class CarServiceImpl implements CarService {
     private BigDecimal basePrice = new BigDecimal("1.0");
     private BigDecimal priceperminute;
-
+    private final long freeParkingTime = 5L;
 
     private final CarRepository carRepository;
     private final ParkingLotService parkingLotService;
@@ -42,7 +46,8 @@ public class CarServiceImpl implements CarService {
         UUID uuid = UUID.randomUUID();
         priceperminute = basePrice.add(basePrice.multiply(floor.getPriceMultiplier()));
         car.setPriceperminute(priceperminute);
-        car.setUuid(uuid.toString());
+        car.setCarid(uuid.toString());
+        car.setStarttime(LocalDateTime.now());
         try {
             carRepository.save(car);
         } catch(IllegalArgumentException e) {
@@ -52,11 +57,7 @@ public class CarServiceImpl implements CarService {
         if (spaceId == null) {                                                           //but i decided to save time and do it the easy way.
             spaceId = 1;
         }
-        try {
-            parkingSpaceService.saveSpace(new ParkingSpace(spaceId, floor.getId(), car.getUuid()));
-        } catch(IllegalArgumentException e) {
-            throw new DbException("Something went wrong. Parking space save failed.");
-        }
+        parkingSpaceService.saveSpace(new ParkingSpace(spaceId, floor.getId(), car.getCarid()));
         return new ParkCarResponse(ParkCarStatus.PARKED, uuid);
     }
 
@@ -69,27 +70,23 @@ public class CarServiceImpl implements CarService {
 
     @Override
     @Transactional
-    public DeleteCarResponse deleteCarById(UUID carId) {
-        Car car = findEmptyParkingSpot(carId);
+    public DeleteCarResponse deleteCarById(String carId) {
+        Car car = findCarFromDb(carId);
         if (car == null) {
-            return new DeleteCarResponse(DeleteCarStatus.NOSUCHCARFOUND, carId); // could be http 404 error if needed.
+            return new DeleteCarResponse(DeleteCarStatus.NOSUCHCARFOUND, carId, null, null, null,null); // could be http 404 error if needed.
         }
         try {
             carRepository.deleteById(car.getId());
         } catch (IllegalArgumentException e) {
-            throw new DbException("Something went wrong. Car not found."); // should never get here since the above findEmptyParkingSpot fails first.
+            throw new DbException("Something went wrong. Car not found."); // should never get here since the above findCarFromDb fails first.
         }                                                                  // But just in case some weird situation happens.
-        try {
-            parkingSpaceService.deleteSpaceByCarId(carId);
-        } catch (NoSuchElementException e) {
-            throw new DbException("Something went wrong. Parking space not found.");
-        }
-        return new DeleteCarResponse(DeleteCarStatus.DELETED, carId);
+        parkingSpaceService.deleteSpaceByCarId(carId);
+        return responseWithTimeStamps(car);
     }
 
     @Override
-    public FindCarResponse findCarByUUID(UUID carId) {
-        Car car = findEmptyParkingSpot(carId);
+    public FindCarResponse findCarByUUID(String carId) {
+        Car car = findCarFromDb(carId);
         if (car == null) {
             return new FindCarResponse(FindCarStatus.CARNOTFOUND, carId, null, null, null);
         }
@@ -97,9 +94,9 @@ public class CarServiceImpl implements CarService {
     }
 
     private FindCarResponse carToResponse(Car car) {
-        ParkingSpace parkingSpace = parkingSpaceService.findSpaceByCarId(car.getUuid());
+        ParkingSpace parkingSpace = parkingSpaceService.findSpaceByCarId(car.getCarid());
         ParkingLot parkingFloor = parkingLotService.findFloorById(parkingSpace.getFloorId());
-        return new FindCarResponse(FindCarStatus.CARFOUND, UUID.fromString(car.getUuid()), parkingFloor.getId(), parkingSpace.getSpaceId(), car.getPriceperminute());
+        return new FindCarResponse(FindCarStatus.CARFOUND, car.getCarid(), parkingFloor.getId(), parkingSpace.getSpaceId(), car.getPriceperminute());
     }
 
     private Integer findFirstEmptySpace(Integer numberOfSpaces, Integer floorId) {
@@ -111,12 +108,25 @@ public class CarServiceImpl implements CarService {
         return null;
     }
 
-    private Car findEmptyParkingSpot(UUID carId) {
+    private Car findCarFromDb(String carId) {
         try {
-            Car car = carRepository.findOne(where(
+            return carRepository.findOne(where(
                     (root, query, criteriaBuilder) ->
-                            criteriaBuilder.equal(root.get("uuid"), carId.toString()))).get();
-            return car;
+                            criteriaBuilder.equal(root.get("carid"), carId))).get();
         } catch (NoSuchElementException e){ return null;}
+    }
+
+    private DeleteCarResponse responseWithTimeStamps(Car car) {
+        LocalDateTime starttime = car.getStarttime();
+        LocalDateTime endtime = LocalDateTime.now();
+        Duration duration = Duration.between(starttime, endtime);
+        long timeTaken = duration.toMinutes();
+        long timeForPricecalculation;
+        if (timeTaken <= freeParkingTime) {
+            timeForPricecalculation = 0L;
+        }
+        else {timeForPricecalculation=timeTaken-freeParkingTime;}
+        BigDecimal priceForParking = car.getPriceperminute().multiply(new BigDecimal(timeForPricecalculation));
+        return new DeleteCarResponse(DeleteCarStatus.DELETED, car.getCarid(), starttime, endtime, timeTaken, priceForParking);
     }
 }
