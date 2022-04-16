@@ -10,8 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
+import java.math.BigDecimal;
 import java.util.List;
-import java.util.UUID;
 import java.util.regex.Pattern;
 
 
@@ -28,7 +28,8 @@ public class CarController {
         if (bindingResult.hasErrors()) {
             return new ParkCarResponse(ParkCarStatus.INVALIDINPUT, null);
         }
-        return carService.saveCar(carDto);
+        BigDecimal priceperminute = null;
+        return carService.saveCar(carDto, priceperminute);
     }
 
     @GetMapping("/findall")

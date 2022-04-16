@@ -1,10 +1,8 @@
 package com.swed.carpark.service;
 
 
-import com.swed.carpark.entity.ParkingLot;
 import com.swed.carpark.entity.ParkingSpace;
 import java.util.List;
-import java.util.UUID;
 
 public interface ParkingSpaceService {
 

@@ -12,12 +12,9 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.math.BigDecimal;
 import java.time.Duration;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.Period;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -26,8 +23,7 @@ import static org.springframework.data.jpa.domain.Specification.where;
 @Service
 @RequiredArgsConstructor
 public class CarServiceImpl implements CarService {
-    private BigDecimal basePrice = new BigDecimal("1.0");
-    private BigDecimal priceperminute;
+    private final BigDecimal basePrice = new BigDecimal("1.0");
     private final long freeParkingTime = 5L;
 
     private final CarRepository carRepository;
@@ -37,7 +33,7 @@ public class CarServiceImpl implements CarService {
 
     @Override
     @Transactional
-    public ParkCarResponse saveCar(CarDto carDto) {
+    public ParkCarResponse saveCar(CarDto carDto, BigDecimal priceperminute) {
         ParkingLot floor = parkingLotService.getBestSuitableFloor(carDto.getWeight(), carDto.getHeight());
         if (floor == null) {
             return new ParkCarResponse(ParkCarStatus.NOSUITABLESPACEFOUND, null); // this could also be an http not found error.
