@@ -36,8 +36,8 @@ public class CarServiceImpl implements CarService {
     public ParkCarResponse saveCar(CarDto carDto, BigDecimal priceperminute) {
         ParkingLot floor = parkingLotService.getBestSuitableFloor(carDto.getWeight(), carDto.getHeight());
         if (floor == null) {
-            return new ParkCarResponse(ParkCarStatus.NOSUITABLESPACEFOUND, null); // this could also be an http not found error.
-        }
+            return new ParkCarResponse(ParkCarStatus.NOSUITABLESPACEFOUND, null);
+        }//could be http 404 error if needed. But i think returning http ok here is a bit better.
         Car car = modelMapper.map(carDto, Car.class);
         UUID uuid = UUID.randomUUID();
         priceperminute = basePrice.add(basePrice.multiply(floor.getPriceMultiplier()));
@@ -45,7 +45,7 @@ public class CarServiceImpl implements CarService {
         car.setCarid(uuid.toString());
         car.setStarttime(LocalDateTime.now());
         try {
-            carRepository.save(car);
+            carRepository.save(car); //Default function so the error has to be caught here.
         } catch(IllegalArgumentException e) {
             throw new DbException("Something went wrong. Car save failed.");
         }
@@ -53,7 +53,7 @@ public class CarServiceImpl implements CarService {
         if (spaceId == null) {                                                           //but i decided to save time and do it the easy way.
             spaceId = 1;
         }
-        parkingSpaceService.saveSpace(new ParkingSpace(spaceId, floor.getId(), car.getCarid()));
+        parkingSpaceService.saveSpace(new ParkingSpace(spaceId, floor.getId(), car.getCarid())); //this throws an error at the function definition so the transaction does not commit.
         return new ParkCarResponse(ParkCarStatus.PARKED, uuid);
     }
 
@@ -69,14 +69,14 @@ public class CarServiceImpl implements CarService {
     public DeleteCarResponse deleteCarById(String carId) {
         Car car = findCarFromDb(carId);
         if (car == null) {
-            return new DeleteCarResponse(DeleteCarStatus.NOSUCHCARFOUND, carId, null, null, null,null); // could be http 404 error if needed.
-        }
+            return new DeleteCarResponse(DeleteCarStatus.NOSUCHCARFOUND, carId, null, null, null,null);
+        }//could be http 404 error if needed. But i think returning http ok here is a bit better.
         try {
-            carRepository.deleteById(car.getId());
+            carRepository.deleteById(car.getId()); //Default function so the error has to be caught here.
         } catch (IllegalArgumentException e) {
             throw new DbException("Something went wrong. Car not found."); // should never get here since the above findCarFromDb fails first.
         }                                                                  // But just in case some weird situation happens.
-        parkingSpaceService.deleteSpaceByCarId(carId);
+        parkingSpaceService.deleteSpaceByCarId(carId); //this throws an error at the function definition so the transaction does not commit.
         return responseWithTimeStamps(car);
     }
 
