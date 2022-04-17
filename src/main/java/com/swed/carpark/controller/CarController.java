@@ -10,8 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
-import java.math.BigDecimal;
-import java.util.List;
 import java.util.regex.Pattern;
 
 
@@ -24,17 +22,16 @@ public class CarController {
             Pattern.compile("^[{]?[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}[}]?$");
 
     @PostMapping("/save")
-    public ParkCarResponse saveCar(@Valid @RequestBody CarDto carDto, BindingResult bindingResult) {
+    public ResponseEntity<?> saveCar(@Valid @RequestBody CarDto carDto, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            return new ParkCarResponse(ParkCarStatus.INVALIDINPUT, null);
+            return new ResponseEntity<>(new ParkCarResponse(ParkCarStatus.INVALIDINPUT, null), HttpStatus.BAD_REQUEST);
         }
-        BigDecimal priceperminute = null;
-        return carService.saveCar(carDto, priceperminute);
+        return new ResponseEntity<>(carService.saveCar(carDto, null), HttpStatus.OK);
     }
 
     @GetMapping("/findall")
-    public List<FindCarResponse> fetchCarList() {
-        return carService.getCarList();
+    public ResponseEntity<?> fetchCarList() {
+        return new ResponseEntity<>(carService.getCarList(), HttpStatus.OK);
     }
 
     @DeleteMapping("/delete/{id}")
@@ -47,10 +44,10 @@ public class CarController {
     }
 
     @GetMapping("/find/{id}")
-    public FindCarResponse findCarByUUID(@PathVariable("id") String carId) {
+    public ResponseEntity<?> findCarByUUID(@PathVariable("id") String carId) {
         if (!UUID_REGEX_PATTERN.matcher(carId).matches()) {
             throw new UuidException("Invalid UUID format.");
         }
-        return carService.findCarByUUID(carId);
+        return new ResponseEntity<>(carService.findCarByUUID(carId), HttpStatus.OK);
     }
 }

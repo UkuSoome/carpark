@@ -46,15 +46,13 @@ public class CarServiceImpl implements CarService {
         car.setStarttime(LocalDateTime.now());
         try {
             carRepository.save(car); //Default function so the error has to be caught here.
-        } catch(IllegalArgumentException e) {
-            throw new DbException("Something went wrong. Car save failed.");
-        }
+        } catch(IllegalArgumentException e) {throw new DbException("Something went wrong. Car save failed.");}
         Integer spaceId = findFirstEmptySpace(floor.getNumberOfSpaces(), floor.getId()); //there probably is some better method to do this,
         if (spaceId == null) {                                                           //but i decided to save time and do it the easy way.
             spaceId = 1;
         }
         parkingSpaceService.saveSpace(new ParkingSpace(spaceId, floor.getId(), car.getCarid())); //this throws an error at the function definition so the transaction does not commit.
-        return new ParkCarResponse(ParkCarStatus.PARKED, uuid);
+        return new ParkCarResponse(ParkCarStatus.PARKED, car.getCarid());
     }
 
     @Override public List<FindCarResponse> getCarList() {
@@ -117,11 +115,10 @@ public class CarServiceImpl implements CarService {
         LocalDateTime endtime = LocalDateTime.now();
         Duration duration = Duration.between(starttime, endtime);
         long timeTaken = duration.toMinutes();
-        long timeForPricecalculation;
+        long timeForPricecalculation; // separate so we can still have the timeTaken in response.
         if (timeTaken <= freeParkingTime) {
             timeForPricecalculation = 0L;
-        }
-        else {timeForPricecalculation=timeTaken-freeParkingTime;}
+        } else {timeForPricecalculation=timeTaken-freeParkingTime;}
         BigDecimal priceForParking = car.getPriceperminute().multiply(new BigDecimal(timeForPricecalculation));
         return new DeleteCarResponse(DeleteCarStatus.DELETED, car.getCarid(), starttime, endtime, timeTaken, priceForParking);
     }

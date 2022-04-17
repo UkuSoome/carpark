@@ -9,5 +9,5 @@ import java.util.UUID;
 @AllArgsConstructor
 public class ParkCarResponse {
     private ParkCarStatus status;
-    private UUID carId;
+    private String carId;
 }

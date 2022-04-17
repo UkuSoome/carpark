@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.RequestBuilder;
@@ -22,18 +21,17 @@ public class CarControllerTest {
     @Autowired
     MockMvc mockMvc;
 
-    @MockBean
-    CarService carService;
+    @Autowired
+    private CarService carService;
 
     @Test
     public void saveCar() throws Exception {
-
         JSONObject json = new JSONObject();
-        json.put("weight", 1000);
-        json.put("height", 500);
+        json.put("weight", 351);
+        json.put("height", 50);
 
         RequestBuilder request = MockMvcRequestBuilders
-                .post("/cars")
+                .post("/cars/save")
                 .content(json.toString())
                 .contentType(MediaType.APPLICATION_JSON);
 
@@ -44,25 +42,23 @@ public class CarControllerTest {
     @Test
     public void getCarList() throws Exception {
         RequestBuilder request = MockMvcRequestBuilders
-                .get("/cars");
+                .get("/cars/findall");
 
         mockMvc.perform((request)).andExpect(status().isOk());
     }
 
     @Test
     public void deleteCarById() throws Exception {
-        UUID uuid = UUID.randomUUID();
         RequestBuilder request = MockMvcRequestBuilders
-                .delete("/cars/" + uuid.toString());
+                .delete("/cars/delete/" + UUID.randomUUID());
 
         mockMvc.perform(request).andExpect(status().isOk());
     }
 
     @Test
     public void findCarByUUID() throws Exception {
-        UUID uuid = UUID.randomUUID();
         RequestBuilder request = MockMvcRequestBuilders
-                .get("/cars/" + uuid.toString());
+                .get("/cars/find/" + UUID.randomUUID());
 
         mockMvc.perform(request).andExpect(status().isOk());
     }

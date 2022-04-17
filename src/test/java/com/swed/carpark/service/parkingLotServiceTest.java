@@ -3,35 +3,34 @@ package com.swed.carpark.service;
 import com.swed.carpark.entity.ParkingLot;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
-import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
-@AutoConfigureMockMvc
 public class parkingLotServiceTest {
     @Autowired
     ParkingLotService parkingLotService;
 
     @Test
     public void saveFloor() {
-        ParkingLot testFloor = new ParkingLot(1, 1000, 500, new BigDecimal(0.5));
+        ParkingLot testFloor = new ParkingLot(1, 1000, 500, new BigDecimal("0.5"), 5);
         ParkingLot floor = parkingLotService.saveFloor(testFloor);
-        assert(floor.getId()==1);
+        assertTrue(floor.getId()==1 && floor.getWeightLim() == 1000 && floor.getHeightLim() == 500);
     }
     @Test
     public void getBestSuitableFloor() {
-        Integer weight = 1000;
-        Integer height = 500;
+        Integer weight = 351;
+        Integer height = 50;
         ParkingLot floor = parkingLotService.getBestSuitableFloor(weight,height);
-        assert(floor.getWeightLim()== weight.intValue());
-        assert(floor.getHeightLim()== height.intValue());
+        assertTrue(weight <= floor.getWeightLim() && height <= floor.getHeightLim());
     }
     @Test
     public void findFloorById() {
-        Optional<ParkingLot> floor = parkingLotService.findFloorById(1);
-        assert(floor.get().getId()==1);
+        ParkingLot floor = parkingLotService.findFloorById(1);
+        assertEquals(1, floor.getId());
     }
 }

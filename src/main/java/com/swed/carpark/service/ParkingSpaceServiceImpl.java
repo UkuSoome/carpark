@@ -19,10 +19,9 @@ public class ParkingSpaceServiceImpl implements ParkingSpaceService {
     private final ParkingSpaceRepository parkingSpaceRepository;
 
     @Override
-    public Integer saveSpace(ParkingSpace parkingSpace) throws IllegalArgumentException
-    {
+    public ParkingSpace saveSpace(ParkingSpace parkingSpace) throws IllegalArgumentException {
         try {
-            return parkingSpaceRepository.save(parkingSpace).getSpaceId();
+            return parkingSpaceRepository.save(parkingSpace);
         } catch (IllegalArgumentException e) {
             throw new DbException("Something went wrong. Parking space save failed.");
         }
@@ -33,12 +32,13 @@ public class ParkingSpaceServiceImpl implements ParkingSpaceService {
     public List<ParkingSpace> getSpaces() {return  (List<ParkingSpace>) parkingSpaceRepository.findAll(); }
 
     @Override
-    public void deleteSpaceByCarId(String carId) {
+    public ParkingSpace deleteSpaceByCarId(String carId) {
         try {
             ParkingSpace parkingSpace = parkingSpaceRepository.findOne(where(
                     (root, query, criteriaBuilder) ->
                             criteriaBuilder.equal(root.get("carId"), carId))).get();
             parkingSpaceRepository.delete(parkingSpace);
+            return parkingSpace;
         } catch (NoSuchElementException e) {
             throw new DbException("Something went wrong. Parking space not found.");
         }
