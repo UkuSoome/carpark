@@ -23,8 +23,8 @@ import static org.springframework.data.jpa.domain.Specification.where;
 @Service
 @RequiredArgsConstructor
 public class CarServiceImpl implements CarService {
-    private final BigDecimal basePrice = new BigDecimal("1.0");
-    private final long freeParkingTime = 5L;
+    private final BigDecimal basePrice = new BigDecimal("1.0"); //These would be in database in some configuration in a real situation.
+    private final long freeParkingTime = 5L; //These would be in database in some configuration in a real situation.
 
     private final CarRepository carRepository;
     private final ParkingLotService parkingLotService;
@@ -33,14 +33,14 @@ public class CarServiceImpl implements CarService {
 
     @Override
     @Transactional
-    public ParkCarResponse saveCar(CarDto carDto, BigDecimal priceperminute) {
+    public ParkCarResponse saveCar(CarDto carDto) {
         ParkingLot floor = parkingLotService.getBestSuitableFloor(carDto.getWeight(), carDto.getHeight());
         if (floor == null) {
             return new ParkCarResponse(ParkCarStatus.NOSUITABLESPACEFOUND, null);
         }//could be http 404 error if needed. But i think returning http ok here is a bit better.
         Car car = modelMapper.map(carDto, Car.class);
         UUID uuid = UUID.randomUUID();
-        priceperminute = basePrice.add(basePrice.multiply(floor.getPriceMultiplier()));
+        BigDecimal priceperminute = basePrice.add(basePrice.multiply(floor.getPriceMultiplier()));
         car.setPriceperminute(priceperminute);
         car.setCarid(uuid.toString());
         car.setStarttime(LocalDateTime.now());

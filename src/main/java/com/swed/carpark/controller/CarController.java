@@ -26,7 +26,7 @@ public class CarController {
         if (bindingResult.hasErrors()) {
             return new ResponseEntity<>(new ParkCarResponse(ParkCarStatus.INVALIDINPUT, null), HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(carService.saveCar(carDto, null), HttpStatus.OK);
+        return new ResponseEntity<>(carService.saveCar(carDto), HttpStatus.OK);
     }
 
     @GetMapping("/findall")

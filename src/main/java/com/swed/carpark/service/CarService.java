@@ -10,7 +10,7 @@ import java.util.List;
 
 
 public interface CarService {
-    ParkCarResponse saveCar(CarDto cardto, BigDecimal priceperminute);
+    ParkCarResponse saveCar(CarDto cardto);
 
     List<FindCarResponse> getCarList();
 
